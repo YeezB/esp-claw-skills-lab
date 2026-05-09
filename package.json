@@ -1,0 +1,46 @@
+{
+  "name": "esp-claw-skills-lab",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build",
+    "format": "oxfmt src/",
+    "validate-skills": "tsx scripts/validate-skills.ts"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.14.0",
+    "@primeuix/themes": "^2.0.3",
+    "dompurify": "^3.4.2",
+    "highlight.js": "^11.11.1",
+    "markdown-it": "^14.1.1",
+    "minisearch": "^7.2.0",
+    "pinia": "^3.0.4",
+    "primevue": "^4.5.5",
+    "vue": "^3.5.32",
+    "vue-i18n": "^11.4.2",
+    "vue-router": "^5.0.4"
+  },
+  "devDependencies": {
+    "@tsconfig/node24": "^24.0.4",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^24.12.2",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/tsconfig": "^0.9.1",
+    "gray-matter": "^4.0.3",
+    "npm-run-all2": "^8.0.4",
+    "oxfmt": "^0.48.0",
+    "tsx": "^4.21.0",
+    "typescript": "~6.0.0",
+    "vite": "^8.0.8",
+    "vite-plugin-vue-devtools": "^8.1.1",
+    "vue-tsc": "^3.2.6"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}
