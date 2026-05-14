@@ -12,6 +12,8 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      VITE_BUILD_GIT_SHA: ${{ github.sha }}
 
     steps:
       - name: Checkout repository

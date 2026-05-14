@@ -26,6 +26,14 @@ const store = useSkillsStore()
     >
       {{ t(`category.${cat}`) }}
     </button>
+    <div class="sidebar-divider" />
+    <button
+      class="sidebar-item"
+      :class="{ active: store.activeCategory === 'all' }"
+      @click="store.setCategory('all')"
+    >
+      {{ t('category.all') }}
+    </button>
   </aside>
 </template>
 

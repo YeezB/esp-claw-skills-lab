@@ -32,6 +32,7 @@ export default {
     overview: 'Overview',
     skillsDetail: 'Skills Detail',
     files: 'Files',
+    viewOnGithub: 'View on GitHub',
     lastUpdate: 'Last update',
     author: 'Author',
     categories: 'Categories',
@@ -49,6 +50,9 @@ export default {
   install: {
     title: 'Install to ESP-Claw',
     instruction: 'Please send the following to your ESP-Claw',
+    command: 'Download the following Skill from ESP-Claw Skills Lab: {id}',
+    safetyMessage:
+      'Before installing, we recommend reviewing the raw files to assess the Skill safety.',
     copySuccess: 'Copied!',
     copy: 'Copy',
     close: 'Close',

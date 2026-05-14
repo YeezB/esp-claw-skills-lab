@@ -36,6 +36,8 @@ defineProps<{ skills: SkillData[] }>()
   color: var(--text-muted);
   font-size: 0.95rem;
   flex-basis: 100%;
+  max-width: 100%;
+  text-align: center;
 }
 
 @media (min-width: 720px) {
@@ -43,12 +45,22 @@ defineProps<{ skills: SkillData[] }>()
     flex-basis: calc(50% - 0.375rem);
     max-width: calc(50% - 0.375rem);
   }
+
+  .skill-grid > .empty-state {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
 }
 
 @media (min-width: 1200px) {
   .skill-grid > * {
     flex-basis: calc((100% - 1.5rem) / 3);
     max-width: calc((100% - 1.5rem) / 3);
+  }
+
+  .skill-grid > .empty-state {
+    flex-basis: 100%;
+    max-width: 100%;
   }
 }
 </style>

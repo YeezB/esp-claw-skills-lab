@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { ArrowLeft, Package, FileText, Puzzle, Copy, Check } from '@lucide/vue'
+import { ArrowLeft, Package, FileText, Puzzle, Copy, Check, ExternalLink } from '@lucide/vue'
 import MarkdownPreview from '@/components/MarkdownPreview.vue'
 import FileTree from '@/components/FileTree.vue'
 import RawPreviewModal from '@/components/RawPreviewModal.vue'
@@ -33,10 +33,16 @@ const totalSizeFormatted = computed(() => {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 })
+const buildGitSha = import.meta.env.VITE_BUILD_GIT_SHA || 'master'
 
 const peripherals = computed(() => skill.value?.metadata.peripherals ?? [])
 const tags = computed(() => skill.value?.metadata.tags ?? [])
 const categories = computed(() => skill.value?.metadata.category ?? [])
+const githubTreeUrl = computed(() =>
+  skill.value
+    ? `https://github.com/espressif/esp-claw-skills-lab/tree/${buildGitSha}/skills/${skill.value.id}`
+    : '',
+)
 const authorInfo = computed(() => {
   const rawAuthor = skill.value?.author?.trim() ?? ''
   const match = rawAuthor.match(/^(.*?)\s*<([^<>\s]+@[^<>\s]+)>$/)
@@ -56,7 +62,7 @@ const authorInfo = computed(() => {
   }
 })
 const installText = computed(() =>
-  skill.value ? `Install the following Skill from the ESP-Claw Skills Lab: ${skill.value.id}` : '',
+  skill.value ? t('install.command', { id: skill.value.id }) : '',
 )
 
 async function loadSkill() {
@@ -78,6 +84,11 @@ async function loadSkill() {
 }
 
 function goBack() {
+  router.push(`/${lang.value}`)
+}
+
+function goToCategory(category: string) {
+  store.searchQuery = `category:"${category}"`
   router.push(`/${lang.value}`)
 }
 
@@ -162,9 +173,6 @@ watch(skillId, loadSkill)
         <div class="overview-info">
           <div class="title-row">
             <h1 class="skill-title">{{ skill.title || skill.name }}</h1>
-            <span v-for="cat in categories" :key="cat" class="tag cat-tag title-badge">
-              {{ cat }}
-            </span>
             <span class="title-id">id: {{ skill.id }}</span>
           </div>
           <div class="skill-meta">
@@ -210,12 +218,21 @@ watch(skillId, loadSkill)
           </div>
           <p class="skill-desc">{{ skill.description }}</p>
           <div class="skill-tags">
-            <template v-if="peripherals.length > 0 || tags.length > 0">
+            <template v-if="categories.length > 0 || peripherals.length > 0 || tags.length > 0">
+              <button
+                v-for="cat in categories"
+                :key="`category:${cat}`"
+                type="button"
+                class="tag tag-button category-tag"
+                @click="goToCategory(cat)"
+              >
+                {{ t(`category.${cat}`) }}
+              </button>
               <button
                 v-for="p in peripherals"
                 :key="`peripheral:${p}`"
                 type="button"
-                class="tag tag-button cat-tag"
+                class="tag tag-button periph-tag"
                 @click="searchByFilter('peripheral', p)"
               >
                 {{ p }}
@@ -240,6 +257,9 @@ watch(skillId, loadSkill)
       <section id="install" class="section">
         <h2 class="section-title">{{ t('detail.installToEspClaw') }}</h2>
         <div>
+          <p class="install-note">
+            {{ t('install.safetyMessage') }}
+          </p>
           <p class="install-instruction">
             {{ t('install.instruction') }}
             <button
@@ -264,7 +284,19 @@ watch(skillId, loadSkill)
       </section>
 
       <section id="files" class="section">
-        <h2 class="section-title">{{ t('detail.files') }}</h2>
+        <div class="section-title-row">
+          <h2 class="section-title">{{ t('detail.files') }}</h2>
+          <a
+            v-if="githubTreeUrl"
+            class="section-link"
+            :href="githubTreeUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ExternalLink :size="14" />
+            <span>{{ t('detail.viewOnGithub') }}</span>
+          </a>
+        </div>
         <FileTree :files="skill.files" @preview="previewFile = $event" />
       </section>
     </div>
@@ -382,13 +414,43 @@ watch(skillId, loadSkill)
   border-bottom: 1px solid var(--border);
 }
 
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-title-row .section-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--accent-soft);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.section-link:hover {
+  color: var(--text-primary);
+}
+
 .overview-info {
   min-width: 0;
 }
 
 .title-row {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.6rem;
   flex-wrap: wrap;
   margin-bottom: 0.5rem;
@@ -480,10 +542,6 @@ watch(skillId, loadSkill)
   font-weight: 500;
 }
 
-.title-badge {
-  font-size: 0.76rem;
-}
-
 .title-id {
   font-size: 0.78rem;
   color: var(--text-muted);
@@ -503,16 +561,16 @@ watch(skillId, loadSkill)
   opacity: 0.92;
 }
 
-.cat-tag {
+.category-tag {
   background: var(--accent-dim);
   color: var(--accent-soft);
   border: 1px solid var(--border-accent);
 }
 
 .periph-tag {
-  background: rgba(104, 211, 145, 0.08);
-  color: var(--green);
-  border: 1px solid rgba(104, 211, 145, 0.2);
+  background: rgba(255, 196, 61, 0.14);
+  color: #ffcf5a;
+  border: 1px solid rgba(255, 196, 61, 0.35);
 }
 
 .plain-tag {
@@ -530,6 +588,16 @@ watch(skillId, loadSkill)
   font-size: 0.92rem;
   color: var(--text-secondary);
   margin-bottom: 1rem;
+}
+
+.install-note {
+  font-size: 0.86rem;
+  color: #e1bb62;
+  background: rgba(255, 196, 61, 0.16);
+  border: 1px solid rgba(255, 196, 61, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.85rem;
+  margin-bottom: 0.85rem;
 }
 
 .install-code-block {
@@ -655,6 +723,11 @@ watch(skillId, loadSkill)
 
   .detail-main {
     padding: 1.5rem;
+  }
+
+  .section-title-row {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .skill-meta {

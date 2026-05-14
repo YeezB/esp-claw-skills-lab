@@ -5,17 +5,19 @@ import type { SkillData } from '@/types/skill'
 
 interface ParsedSearchQuery {
   text: string
+  categories: string[]
   tags: string[]
   peripherals: string[]
 }
 
-const FILTER_PATTERN = /\b(tag|t|peripheral|peripherals):(?:"([^"]+)"|([^\s]+))/gi
+const FILTER_PATTERN = /\b(category|c|tag|t|peripheral|peripherals):(?:"([^"]+)"|([^\s]+))/gi
 
 function normalizeFilterValue(value: string): string {
   return value.trim().toLocaleLowerCase()
 }
 
 function parseSearchQuery(query: string): ParsedSearchQuery {
+  const categories: string[] = []
   const tags: string[] = []
   const peripherals: string[] = []
 
@@ -26,7 +28,11 @@ function parseSearchQuery(query: string): ParsedSearchQuery {
         const rawValue = (quoted ?? bare ?? '').trim()
         if (!rawValue) return ' '
 
-        if (['tag', 't'].includes(filterType.toLocaleLowerCase())) {
+        const normalizedFilterType = filterType.toLocaleLowerCase()
+
+        if (['category', 'c'].includes(normalizedFilterType)) {
+          categories.push(rawValue)
+        } else if (['tag', 't'].includes(normalizedFilterType)) {
           tags.push(rawValue)
         } else {
           peripherals.push(rawValue)
@@ -37,7 +43,11 @@ function parseSearchQuery(query: string): ParsedSearchQuery {
     .replace(/\s+/g, ' ')
     .trim()
 
-  return { text, tags, peripherals }
+  return { text, categories, tags, peripherals }
+}
+
+function getCategoryValues(skill: SkillData): Set<string> {
+  return new Set((skill.metadata.category ?? []).map(normalizeFilterValue))
 }
 
 function getTagValues(skill: SkillData): Set<string> {
@@ -55,10 +65,14 @@ function getPeripheralValues(skill: SkillData): Set<string> {
 }
 
 function matchesFilters(skill: SkillData, parsedQuery: ParsedSearchQuery): boolean {
+  const categoryValues = getCategoryValues(skill)
   const tagValues = getTagValues(skill)
   const peripheralValues = getPeripheralValues(skill)
 
   return (
+    parsedQuery.categories.every((category) =>
+      categoryValues.has(normalizeFilterValue(category)),
+    ) &&
     parsedQuery.tags.every((tag) => tagValues.has(normalizeFilterValue(tag))) &&
     parsedQuery.peripherals.every((peripheral) =>
       peripheralValues.has(normalizeFilterValue(peripheral)),

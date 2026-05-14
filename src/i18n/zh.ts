@@ -32,6 +32,7 @@ export default {
     overview: '概览',
     skillsDetail: 'Skill 详情',
     files: '文件',
+    viewOnGithub: '在 GitHub 查看',
     lastUpdate: '最后更新',
     author: '作者',
     categories: '分类',
@@ -49,6 +50,8 @@ export default {
   install: {
     title: '安装到 ESP-Claw',
     instruction: '请将下文发送给您的 ESP-Claw',
+    command: '从 ESP-Claw Skills Lab 下载以下 Skill: {id}',
+    safetyMessage: '安装前，推荐您查看原始文件评估 Skill 安全性。',
     copySuccess: '已复制！',
     copy: '复制',
     close: '关闭',
