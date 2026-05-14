@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { execFileSync } from 'node:child_process'
 import type { Connect } from 'vite'
 import matter from 'gray-matter'
 import type { Plugin, ViteDevServer } from 'vite'
@@ -79,7 +80,30 @@ function collectSubdirFiles(skillDir: string, subdir: string): string[] {
     .map(e => e.name)
 }
 
-function getLastModified(dir: string): string {
+function formatDate(value: string | number): string {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0]
+}
+
+function getGitLastModified(dir: string): string {
+  try {
+    const gitDate = execFileSync(
+      'git',
+      ['log', '-1', '--format=%cI', '--', dir],
+      {
+        cwd: process.cwd(),
+        encoding: 'utf-8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      },
+    ).trim()
+
+    return gitDate ? formatDate(gitDate) : ''
+  } catch {
+    return ''
+  }
+}
+
+function getMtimeLastModified(dir: string): string {
   let latest = 0
   const walk = (d: string) => {
     for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
@@ -94,7 +118,11 @@ function getLastModified(dir: string): string {
     }
   }
   walk(dir)
-  return latest ? new Date(latest).toISOString().split('T')[0] : ''
+  return latest ? formatDate(latest) : ''
+}
+
+function getLastModified(dir: string): string {
+  return getGitLastModified(dir) || getMtimeLastModified(dir)
 }
 
 function copyDir(src: string, dest: string) {
