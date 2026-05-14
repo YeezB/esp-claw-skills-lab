@@ -26,13 +26,16 @@ function validateAuthor(skill: string, author: unknown) {
   if (author.includes('<') || author.includes('>')) {
     const emailPattern = /^[^<>]+<[^@<>]+@[^@<>]+\.[^@<>]+>$/
     if (!emailPattern.test(author)) {
-      addError(skill, '`author` with angle brackets must contain exactly one valid email: "Name <email>"')
+      addError(
+        skill,
+        '`author` with angle brackets must contain exactly one valid email: "Name <email>"',
+      )
     }
   }
 }
 
 function isStringArray(value: unknown): value is string[] {
-  return Array.isArray(value) && value.every(item => typeof item === 'string')
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
 }
 
 if (!fs.existsSync(skillsDir)) {
@@ -40,7 +43,7 @@ if (!fs.existsSync(skillsDir)) {
   process.exit(0)
 }
 
-const entries = fs.readdirSync(skillsDir, { withFileTypes: true }).filter(e => e.isDirectory())
+const entries = fs.readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory())
 
 if (entries.length === 0) {
   console.log('No skill subdirectories found.')
@@ -123,7 +126,10 @@ for (const entry of entries) {
       } else {
         for (const p of peripherals) {
           if (!(ALLOWED_PERIPHERALS as readonly string[]).includes(p as string)) {
-            addError(skillId, `Unknown peripheral: "${p}". Allowed: ${ALLOWED_PERIPHERALS.join(', ')}`)
+            addError(
+              skillId,
+              `Unknown peripheral: "${p}". Allowed: ${ALLOWED_PERIPHERALS.join(', ')}`,
+            )
           }
         }
       }

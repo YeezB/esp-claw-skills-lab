@@ -9,8 +9,9 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "format": "oxfmt src/",
-    "validate-skills": "tsx scripts/validate-skills.ts"
+    "format": "oxfmt .",
+    "validate-skills": "tsx scripts/validate-skills.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@lucide/vue": "^1.14.0",
@@ -32,6 +33,7 @@
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/tsconfig": "^0.9.1",
     "gray-matter": "^4.0.3",
+    "husky": "^9.1.7",
     "npm-run-all2": "^8.0.4",
     "oxfmt": "^0.48.0",
     "tsx": "^4.21.0",

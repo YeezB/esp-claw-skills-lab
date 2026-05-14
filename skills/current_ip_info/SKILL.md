@@ -3,15 +3,13 @@
   "name": "current_ip_info",
   "description": "Fetch the current public IP geolocation information through lua_module_call_capability and https://ipinfo.io/json.",
   "author": "ESP-Claw contributor",
-  "metadata": {
-    "category": "web",
-    "tags": ["ip"],
-    "cap_groups": [
-      "cap_lua",
-      "cap_web_search"
-    ],
-    "manage_mode": "web"
-  }
+  "metadata":
+    {
+      "category": ["network"],
+      "tags": ["ip"],
+      "cap_groups": ["cap_lua", "cap_web_search"],
+      "manage_mode": "web"
+    }
 }
 ---
 

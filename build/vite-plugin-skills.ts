@@ -28,7 +28,11 @@ interface SkillEntry {
 
 interface JsonMatterOptions extends matter.GrayMatterOption<string, JsonMatterOptions> {}
 
-function parseSkillMd(filePath: string): { frontmatter: Record<string, unknown>; title: string; body: string } {
+function parseSkillMd(filePath: string): {
+  frontmatter: Record<string, unknown>
+  title: string
+  body: string
+} {
   const raw = fs.readFileSync(filePath, 'utf-8')
   const matterOptions: JsonMatterOptions = {
     engines: {
@@ -48,7 +52,10 @@ function parseSkillMd(filePath: string): { frontmatter: Record<string, unknown>;
   return { frontmatter: data, title, body: content }
 }
 
-function collectFiles(dir: string, base: string = ''): { relativePaths: string[]; totalSize: number } {
+function collectFiles(
+  dir: string,
+  base: string = '',
+): { relativePaths: string[]; totalSize: number } {
   const relativePaths: string[] = []
   let totalSize = 0
 
@@ -75,9 +82,10 @@ function collectFiles(dir: string, base: string = ''): { relativePaths: string[]
 function collectSubdirFiles(skillDir: string, subdir: string): string[] {
   const full = path.join(skillDir, subdir)
   if (!fs.existsSync(full)) return []
-  return fs.readdirSync(full, { withFileTypes: true })
-    .filter(e => e.isFile())
-    .map(e => e.name)
+  return fs
+    .readdirSync(full, { withFileTypes: true })
+    .filter((e) => e.isFile())
+    .map((e) => e.name)
 }
 
 function formatDate(value: string | number): string {
@@ -87,15 +95,11 @@ function formatDate(value: string | number): string {
 
 function getGitLastModified(dir: string): string {
   try {
-    const gitDate = execFileSync(
-      'git',
-      ['log', '-1', '--format=%cI', '--', dir],
-      {
-        cwd: process.cwd(),
-        encoding: 'utf-8',
-        stdio: ['ignore', 'pipe', 'ignore'],
-      },
-    ).trim()
+    const gitDate = execFileSync('git', ['log', '-1', '--format=%cI', '--', dir], {
+      cwd: process.cwd(),
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim()
 
     return gitDate ? formatDate(gitDate) : ''
   } catch {
@@ -239,8 +243,9 @@ export default function skillsPlugin(): Plugin {
         return
       }
 
-      const entries = fs.readdirSync(skillsDir, { withFileTypes: true })
-        .filter(e => e.isDirectory())
+      const entries = fs
+        .readdirSync(skillsDir, { withFileTypes: true })
+        .filter((e) => e.isDirectory())
 
       const skills: SkillEntry[] = []
 

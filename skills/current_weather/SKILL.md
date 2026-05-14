@@ -3,15 +3,13 @@
   "name": "current_weather",
   "description": "Fetch current weather through lua_module_call_capability and https://api.open-meteo.com. Defaults to Singapore.",
   "author": "ESP-Claw contributor",
-  "metadata": {
-    "category": "utility",
-    "tags": ["weather", "info"],
-    "cap_groups": [
-      "cap_lua",
-      "cap_web_search"
-    ],
-    "manage_mode": "web"
-  }
+  "metadata":
+    {
+      "category": ["utility"],
+      "tags": ["weather", "info"],
+      "cap_groups": ["cap_lua", "cap_web_search"],
+      "manage_mode": "web"
+    }
 }
 ---
 

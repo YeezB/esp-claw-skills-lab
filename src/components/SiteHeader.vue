@@ -74,7 +74,12 @@ function switchLang(lang: Lang) {
         </ul>
       </details>
 
-      <a :href="`https://esp-claw.com/${currentLang}/tutorial/skills-lab#upload`" target="_blank" rel="noopener" class="btn-upload">
+      <a
+        :href="`https://esp-claw.com/${currentLang}/tutorial/skills-lab#upload`"
+        target="_blank"
+        rel="noopener"
+        class="btn-upload"
+      >
         <Upload :size="14" />
         {{ t('nav.upload') }}
       </a>
@@ -118,7 +123,12 @@ function switchLang(lang: Lang) {
             </a>
           </div>
         </details>
-        <a :href="`https://esp-claw.com/${currentLang}/tutorial/skills-lab#upload`" target="_blank" rel="noopener" class="mobile-upload">
+        <a
+          :href="`https://esp-claw.com/${currentLang}/tutorial/skills-lab#upload`"
+          target="_blank"
+          rel="noopener"
+          class="mobile-upload"
+        >
           <Upload :size="14" />
           {{ t('nav.upload') }}
         </a>

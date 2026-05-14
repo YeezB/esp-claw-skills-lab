@@ -1,15 +1,16 @@
 ---
 {
-  "name": "example-skill",
+  "name": "example_skill",
   "description": "How to answer current weather, temperature, and forecast queries through direct web search capabilities.",
   "author": "Espressif <test@espressif.com>",
-  "metadata": {
-    "cap_groups": ["cap_time", "cap_web_search"],
-    "manage_mode": "web",
-    "category": ["utility"],
-    "peripherals": ["gpio"],
-    "tags": ["weather", "forecast", "temperature", "天气", "预报", "温度"]
-  }
+  "metadata":
+    {
+      "cap_groups": ["cap_time", "cap_web_search"],
+      "manage_mode": "web",
+      "category": ["utility"],
+      "peripherals": ["gpio"],
+      "tags": ["weather", "forecast", "temperature", "天气", "预报", "温度"]
+    }
 }
 ---
 
