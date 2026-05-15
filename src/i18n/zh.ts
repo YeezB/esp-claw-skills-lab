@@ -23,7 +23,7 @@ export default {
     utility: '🔧 工具',
     hardware: '💻 硬件',
     media: '🎥 媒体',
-    network: '🛜 网络',
+    network: '📡 网络',
     sensor: '🌍 传感器',
     ai: '🤖 AI',
   },
