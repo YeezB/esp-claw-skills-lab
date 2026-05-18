@@ -33,6 +33,21 @@ const totalSizeFormatted = computed(() => {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 })
+const lastModifiedFormatted = computed(() => {
+  const timestamp = skill.value?.lastModified ?? 0
+  if (!timestamp) return 'N/A'
+
+  const date = new Date(timestamp)
+  if (Number.isNaN(date.getTime())) return 'N/A'
+
+  return new Intl.DateTimeFormat(undefined, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+})
 const buildGitSha = import.meta.env.VITE_BUILD_GIT_SHA || 'master'
 
 const peripherals = computed(() => skill.value?.metadata.peripherals ?? [])
@@ -177,7 +192,7 @@ watch(skillId, loadSkill)
           </div>
           <div class="skill-meta">
             <span class="meta-item">
-              {{ t('detail.lastUpdate') }}: {{ skill.lastModified || 'N/A' }}
+              {{ t('detail.lastUpdate') }}: {{ lastModifiedFormatted }}
             </span>
             <span v-if="authorInfo.name" class="meta-item">
               {{ t('detail.author') }}:

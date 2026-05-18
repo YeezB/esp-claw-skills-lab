@@ -22,8 +22,14 @@ interface SkillEntry {
   extra_files: SkillExtraFiles
   files: string[]
   totalSize: number
-  lastModified: string
+  lastModified: number
   featured: boolean
+}
+
+interface SkillTagsIndex {
+  category: string[]
+  tag: string[]
+  peripheral: string[]
 }
 
 interface JsonMatterOptions extends matter.GrayMatterOption<string, JsonMatterOptions> {}
@@ -88,12 +94,13 @@ function collectSubdirFiles(skillDir: string, subdir: string): string[] {
     .map((e) => e.name)
 }
 
-function formatDate(value: string | number): string {
+function toTimestamp(value: string | number): number {
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0]
+  const timestamp = date.getTime()
+  return Number.isNaN(timestamp) ? 0 : timestamp
 }
 
-function getGitLastModified(dir: string): string {
+function getGitLastModified(dir: string): number {
   try {
     const gitDate = execFileSync('git', ['log', '-1', '--format=%cI', '--', dir], {
       cwd: process.cwd(),
@@ -101,13 +108,13 @@ function getGitLastModified(dir: string): string {
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim()
 
-    return gitDate ? formatDate(gitDate) : ''
+    return gitDate ? toTimestamp(gitDate) : 0
   } catch {
-    return ''
+    return 0
   }
 }
 
-function getMtimeLastModified(dir: string): string {
+function getMtimeLastModified(dir: string): number {
   let latest = 0
   const walk = (d: string) => {
     for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
@@ -122,11 +129,39 @@ function getMtimeLastModified(dir: string): string {
     }
   }
   walk(dir)
-  return latest ? formatDate(latest) : ''
+  return latest ? Math.trunc(latest) : 0
 }
 
-function getLastModified(dir: string): string {
+function getLastModified(dir: string): number {
   return getGitLastModified(dir) || getMtimeLastModified(dir)
+}
+
+function addStringArrayValues(target: Set<string>, value: unknown) {
+  if (!Array.isArray(value)) return
+
+  for (const item of value) {
+    if (typeof item === 'string' && item.trim()) {
+      target.add(item)
+    }
+  }
+}
+
+function buildTagsIndex(skills: SkillEntry[]): SkillTagsIndex {
+  const categories = new Set<string>()
+  const tags = new Set<string>()
+  const peripherals = new Set<string>()
+
+  for (const skill of skills) {
+    addStringArrayValues(categories, skill.metadata.category)
+    addStringArrayValues(tags, skill.metadata.tags)
+    addStringArrayValues(peripherals, skill.metadata.peripherals)
+  }
+
+  return {
+    category: Array.from(categories).sort(),
+    tag: Array.from(tags).sort(),
+    peripheral: Array.from(peripherals).sort(),
+  }
 }
 
 function copyDir(src: string, dest: string) {
@@ -240,6 +275,11 @@ export default function skillsPlugin(): Plugin {
 
       if (!fs.existsSync(skillsDir)) {
         fs.writeFileSync(path.join(generatedDir, 'skills-data.json'), '[]', 'utf-8')
+        fs.writeFileSync(
+          path.join(generatedDir, 'tags.json'),
+          JSON.stringify(buildTagsIndex([])),
+          'utf-8',
+        )
         return
       }
 
@@ -289,6 +329,7 @@ export default function skillsPlugin(): Plugin {
           name: skillData.name,
           description: skillData.description,
           author: skillData.author,
+          last_modified: skillData.lastModified,
           metadata: meta,
           extra_files: extraFiles,
         }
@@ -299,9 +340,10 @@ export default function skillsPlugin(): Plugin {
         )
       }
 
+      fs.writeFileSync(path.join(generatedDir, 'skills-data.json'), JSON.stringify(skills), 'utf-8')
       fs.writeFileSync(
-        path.join(generatedDir, 'skills-data.json'),
-        JSON.stringify(skills, null, 2),
+        path.join(generatedDir, 'tags.json'),
+        JSON.stringify(buildTagsIndex(skills)),
         'utf-8',
       )
     },
@@ -309,9 +351,21 @@ export default function skillsPlugin(): Plugin {
     writeBundle(options) {
       const outDir = options.dir || path.resolve(process.cwd(), 'dist')
       const rawDest = path.join(outDir, 'raw')
+      const skillsDataPath = path.join(generatedDir, 'skills-data.json')
+      const tagsDataPath = path.join(generatedDir, 'tags.json')
 
       if (fs.existsSync(skillsDir)) {
         copyDir(skillsDir, rawDest)
+      }
+
+      if (fs.existsSync(skillsDataPath)) {
+        fs.mkdirSync(rawDest, { recursive: true })
+        fs.copyFileSync(skillsDataPath, path.join(rawDest, 'skills-data.json'))
+      }
+
+      if (fs.existsSync(tagsDataPath)) {
+        fs.mkdirSync(rawDest, { recursive: true })
+        fs.copyFileSync(tagsDataPath, path.join(rawDest, 'tags.json'))
       }
     },
   }

@@ -30,5 +30,5 @@ export interface SkillData {
   extra_files: SkillExtraFiles
   files: string[]
   totalSize: number
-  lastModified: string
+  lastModified: number
 }
