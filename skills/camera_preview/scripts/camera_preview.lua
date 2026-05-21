@@ -67,14 +67,13 @@ if pixel_format ~= "RGBP" and pixel_format ~= "RGBR" then
     return
 end
 
-local width = display.width()
-local height = display.height()
+local width = display.width
+local height = display.height
 local x = 0
 local y = 0
 
 local function draw_frame(frame)
-    local frame_ptr = frame:ptr()
-    display.draw_rgb565_fit(x, y, info_or_err.width, info_or_err.height, width, height, frame_ptr)
+    display.draw_image(x, y, frame, { mode = "fit", width = width, height = height })
     display.present()
 end
 
@@ -83,7 +82,7 @@ print(string.format(
     info_or_err.width, info_or_err.height, pixel_format, width, height, panel_if_name
 ))
 
-display.begin_frame({ clear = true, r = 0, g = 0, b = 0 })
+display.begin_frame({ clear = true })
 
 while true do
     local frame_ok, frame_or_err = pcall(camera.get_frame, FRAME_TIMEOUT_MS)
@@ -94,7 +93,7 @@ while true do
 
     local draw_ok, draw_err = pcall(draw_frame, frame_or_err)
 
-    pcall(camera.release_frame, frame_or_err)
+    pcall(frame_or_err.release, frame_or_err)
 
     if not draw_ok then
         print("[camera_preview_demo] ERROR: draw failed: " .. tostring(draw_err))
