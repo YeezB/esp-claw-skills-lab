@@ -6,7 +6,7 @@
   "metadata":
     {
       "category": ["hardware"],
-      "tags": ["unihiker", "k10", "button", "xl9535", "i2c", "interrupt-like"],
+      "tags": ["unihiker", "k10", "xl9535", "i2c", "interrupt-like"],
       "peripherals": ["button"],
       "cap_groups": ["cap_lua"],
       "manage_mode": "web"
